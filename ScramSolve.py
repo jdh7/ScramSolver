@@ -1,25 +1,36 @@
-unplaced = [[-1,-3,-4,-2],
-            [1,2,3,4],
-            [4,-1,-4,-2],
-            [1,-3,-2,4],
-            [-3,-1,-2,-4],
-            [-2, 3, -1,1],
-            [3,2,-1,4],
-            [3,-4,2,-3],
-            [-2,-1,-3,3]]
-unplacedDeep = [[-1,-3,-4,-2],
-            [1,2,3,4],
-            [4,-1,-4,-2],
-            [1,-3,-2,4],
-            [-3,-1,-2,-4],
-            [-2, 3, -1,1],
-            [3,2,-1,4],
-            [3,-4,2,-3],
-            [-2,-1,-3,3]]
+import copy
+print("Welcome to Scram Solver. This program requires numerical conversions
+        of picture halves found on individual scramble square picture pieces
+        and returns the solved puzzle."\n)
+print("Determine the four sets of pairs on the scramble square pieces and 
+        assign each half an integer from -4 to 4. Enter each integer of the
+        card when prompted from top -> right -> bottom -> left.")
+ue1 = list(map(int,input("Please insert the first card (TRBL):").split()))
+ue2 = list(map(int,input("Please insert the second card (TRBL):").split()))
+ue3 = list(map(int,input("Please insert the third card (TRBL):").split()))
+ue4 = list(map(int,input("Please insert the fourth card (TRBL):").split()))
+ue5 = list(map(int,input("Please insert the fifth card (TRBL):").split()))
+ue6 = list(map(int,input("Please insert the sixth card (TRBL):").split()))
+ue7 = list(map(int,input("Please insert the seventh card (TRBL):").split()))
+ue8 = list(map(int,input("Please insert the eighth card (TRBL):").split()))
 
-def orientation(carD):
+# unplaced = [[-1,-3,-4,-2],
+#             [1,2,3,4],
+#             [4,-1,-4,-2],
+#             [1,-3,-2,4],
+#             [-3,-1,-2,-4],
+#             [-2, 3, -1,1],
+#             [3,2,-1,4],
+#             [3,-4,2,-3],
+#             [-2,-1,-3,3]]
+
+unplaced = [eu1, ue2, ue3, ue4, ue5, ue6, ue7, ue8]
+
+unplacedDeep = copy.deepcopy(unplaced)
+
+def orientation(piece):
     myOrder = [1, 2, 3, 0]                              
-    NewOrder = [carD[i] for i in myOrder]
+    NewOrder = [piece[i] for i in myOrder]
     return NewOrder                          
 
 
@@ -68,21 +79,12 @@ def EdgeCheck(potentialcard):  # takes the current card orientation as argument
 
 
 def UsedSolCheck(string, solutions):
-    checkS = [e for e in solutions]
-    checkS.append(string)
-    if checkS in snapshot:
+    checks = [e for e in solutions]
+    checks.append(string)
+    if checks in snapshot:
         return False
     else:
         return True
-
-# def UsedCheck(lizt, zsolution):
-#     czeck = []
-#     for a, _ in zsolution:
-#         czeck.append(a)
-#     if lizt in czeck:
-#         return False
-#     else:
-#         return True 
 
 def UsedCheck(lizt, zsolution):
     czeck = []
@@ -97,9 +99,6 @@ solvisited = []
 solution = []
 snapshot = []
 
-attppp = 0
-answers = [0,0,0,0,0,0,0,0,0]
-
 for i in range(len(unplaced)):
     solution = [[unplacedDeep[i], 0]]
     solutionDeep = [unplacedDeep[i]]                                 
@@ -107,7 +106,7 @@ for i in range(len(unplaced)):
     solvisited = [strnger]
     snapshot = []
     cycles = -1
-    print("Attempts:", attppp, "Solution length", len(solution), "i piece:", i, unplacedDeep[i], answers)
+    print("Attempts:", "Solution length", len(solution), "i piece:", i, unplacedDeep[i])
 
     if len(solution) == 9:
         break
@@ -124,19 +123,8 @@ for i in range(len(unplaced)):
                 
                 for n in range(0, 4):
                     Stringer = int(str(n+1)+str(j)+str(len(solution)))
-                    attppp += 1
 
                     if (EdgeCheck(unplaced[j]) == True) and UsedSolCheck(Stringer, solvisited) and UsedCheck(unplacedDeep[j], solutionDeep):
-                        # pdb.set_trace()
-                        
-                        # print(f'solvisited is {solvisited}')
-                        # print(f'snapshot is {snapshot}')
-                        # print(f'j is {j} and potential card is: {unplaced[j]} deepcopy is: {unplacedDeep[j]}')
-                        # print(f'solution is: {solution}')
-                        # print(f'EdgeCheck is {EdgeCheck(unplaced[j])}')
-                        # print(f'UsedSolCheck is {UsedSolCheck(Stringer, solvisited)}')
-                        # print(f'UsedCheck is {UsedCheck(unplacedDeep[j], solution)}')
-                        # print("EdgeCheck =",EdgeCheck(unplaced[j]) and UsedSolCheck(Stringer, solvisited) and UsedCheck(unplacedDeep[j], solution))
                         
                         x = unplaced[j]
                         goodCard = [x,n]
@@ -144,35 +132,18 @@ for i in range(len(unplaced)):
                         solutionDeep.append(unplacedDeep[j])
                         solvisited.append(Stringer)
                         cycles = 0
-                        answers[len(solution)-1] += 1
 
                     else:
                         unplaced[j] = orientation((unplaced[j]))
                     
                     if len(solution) == 9:
-                        print("attempts:", attppp, "Solution Found:", solution, "\n", solutionDeep)
+                        print("attempts:", "Solution Found:", solution, "\n", solutionDeep)
                         break 
 
                 if cycles == 8:
-                    # if len(solution) > 7:
-                    #     pdb.set_trace()
-                    #     print("\n\n","*****prePOP*****")
-                    #     print("prepop snap:", snapshot)
-                    #     print("solvisited:", solvisited) 
-                    #     print("Solution so far:", solution)
-                    #     print("\n")
 
                     snapshot.append([e for e in solvisited])
                     solvisited = solvisited[:-1]
                     solution.pop()
                     solutionDeep.pop()
                     cycles = -1
-
-                    # if len(solution) > 7:
-                    #     print("$$$$ Popped $$$$")
-                    #     print("pop snap:", snapshot)
-                    #     print("pop solvisited:", solvisited) 
-                    #     print("pop Solution so far:", solution)
-                    #     print("\n")
-                    #     #pdb.set_trace()
-                    #  
