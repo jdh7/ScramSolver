@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterator, List, Tuple, Generic, TypeVar, NamedTuple, Union
 import pdb
 import time
-from card_shower import Show_board
+from board_draw import Show_board
 
 
 T = TypeVar("T")
