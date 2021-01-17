@@ -1,9 +1,16 @@
 #!/usr/bin/python3
-from __future__ import annotations
+"""
+Depth first search with backtracking Scramble Square puzzle solver.
+To use, replace puzzle piece pictures with upper/lowercase alphabetic
+characters and replace the puzzle input below. 
+Yes this is terrible code, but it works!
+(Ignore the half type-hinting)
+"""
+
+
 from typing import Iterator, List, Tuple, Generic, TypeVar, NamedTuple, Union
-import pdb
-import time
 from board_draw import Show_board
+import time
 
 
 T = TypeVar("T")
@@ -44,8 +51,7 @@ class Board(object):
         return a
 
     def get_adjacencies(self):
-        # ( placed card side, potential card side) index of placed card,
-        # trbl = 0123
+        # ((index of placed card to check against, placed card's side, potential card's side))
         adjacency_list: List[tuple[int, int, int], int] = (
             (None),  # 0
             ((0, self.right, self.left), None),  # 1
@@ -105,6 +111,7 @@ class Card(object):
         self.card_id = card_id
         self.card_ori = card_ori
 
+    # Ugly, but can't think of a better way to do this
     def rotate(self, r: List[int] = [1, 2, 3, 0]) -> Iterator[card]:
         if self.card_ori == 0:
             self.card = "".join(self.card[j] for j in r)
@@ -139,7 +146,8 @@ Moving now into the non-class functions
 and seeing if we can get this baby working.
 """
 
-
+# Just takes in the two card sides and see if they are the same letter
+# and are different cases
 def edgecheck(a: str, b: str):
     c = a.isupper() ^ b.isupper()
     d = a.lower() == b.lower()
@@ -149,6 +157,7 @@ def edgecheck(a: str, b: str):
         return False
 
 
+# Fit checking function, takes the adjacencies listed in board class
 def fits(board, card: str) -> bool:
     global xx
     global board_view
@@ -161,10 +170,7 @@ def fits(board, card: str) -> bool:
         a, b, c = [_ for _ in adj]
         x = edgecheck(board.get_board(a).get_card_sides(b), card.get_card_sides(c))
 
-        # Check we haven't used the card before
-        # z = card.card_id not in board.used_cards
-
-        fits[ind] = x  # and z
+        fits[ind] = x
 
     if False not in fits:
         return True
@@ -174,8 +180,8 @@ def fits(board, card: str) -> bool:
 
 # Recursive search function
 def find_next_card(board: Generic[T], potential_cards: List[Generic[T]]):
-    global recursive_calls
     global xx
+    global recursive_calls
     recursive_calls += 1
     for card in potential_cards:
         if card.card_id not in board.used_cards:
@@ -190,9 +196,6 @@ def find_next_card(board: Generic[T], potential_cards: List[Generic[T]]):
                         find_next_card(board, potential_cards)
                         break
 
-        # if board.solved(potential_cards):
-        #     break
-
     if board.solved(potential_cards):
         return
 
@@ -203,9 +206,8 @@ def find_next_card(board: Generic[T], potential_cards: List[Generic[T]]):
         if board.board[0] == None:
             return
 
-        # find_next_card(board, potential_cards)
 
-
+# Main solving function
 def solve(board: Generic[T], starting_cards: List[Card]) -> List[tuple[str, int, int]]:
 
     global board_view
@@ -231,6 +233,7 @@ def solve(board: Generic[T], starting_cards: List[Card]) -> List[tuple[str, int,
                     find_next_card(board, starting_cards)
 
 
+# Puzzle inputs with pictures split into AaBbCcDd
 puzzle_input: List[str] = [
     "acdb",
     "ABCD",
@@ -249,13 +252,19 @@ test_puzzle_input: List[str] = [
     "DadA",
 ]
 
-# Create our list of Card class objects
+# Use xx variable to set the draw speed for terminal
 xx = 0.00
+
+# Create our board object, our board drawing object
 solution = Board()
 board_view = Show_board(xx)
 parsed_cards: List[Generic[T]] = list()
+
+# Keep track of how many times our search function is called
 recursive_calls = 0
 
+
+# Parse all the cards from the input into card objects with card ID #'s
 for idx, card in enumerate(puzzle_input):
     parsed_cards.append(Card(card, idx))
 
